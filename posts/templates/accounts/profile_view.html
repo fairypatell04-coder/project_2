@@ -1,0 +1,25 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from .forms import UserEditForm  # your form for editing
+
+@login_required
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name']  # add profile fields if needed
+def edit_profile(request, username):
+    user_obj = get_object_or_404(User, username=username)
+    if request.user != user_obj:
+        # Prevent editing someone else's profile
+        return redirect('accounts:profile_view', username=request.user.username)
+
+    if request.method == 'POST':
+        form = UserEditForm(request.POST, request.FILES, instance=user_obj)
+        if form.is_valid():
+            form.save()
+            return redirect('accounts:profile_view', username=user_obj.username)
+    else:
+        form = UserEditForm(instance=user_obj)
+
+return render(request, 'posts/edit_profile.html', {'form': form, 'user': user_obj})

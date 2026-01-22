@@ -1,0 +1,81 @@
+{% extends 'posts/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Post by {{ post.author.username }} - JinxxNetwork{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+
+        <!-- Post Card -->
+        <div class="card mb-4 shadow">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url 'accounts:profile_view' post.author.username %}" style="color:#ff4d4d;">
+                        {{ post.author.username }}
+                    </a>
+                </h5>
+
+                <p class="card-text">{{ post.content|linebreaks }}</p>
+
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid rounded mt-2" alt="Post Image">
+                {% endif %}
+            </div>
+
+            <div class="card-footer text-muted">
+                {{ post.created_at|date:"F j, Y, g:i a" }}
+
+                {% if user == post.author %}
+                    <a href="{% url 'posts:post_delete' post.pk %}" class="btn btn-sm btn-danger float-end">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Comment Form -->
+        {% if user.is_authenticated %}
+        <div class="card mb-4 shadow">
+            <div class="card-body">
+                <h6>Leave a Comment:</h6>
+
+                <form method="POST" action="{% url 'posts:add_comment' post.pk %}">
+                    {% csrf_token %}
+
+                    {{ comment_form.content|add_class:"form-control mb-2" }}
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        Comment
+                    </button>
+                </form>
+
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Comments List -->
+        <h5 class="mb-3">Comments</h5>
+
+        {% for comment in comments %}
+        <div class="card mb-2 shadow-sm">
+            <div class="card-body">
+                <p class="mb-1">
+                    <strong>{{ comment.author.username }}</strong>
+                </p>
+
+                <p class="mb-0">
+                    {{ comment.content|linebreaks }}
+                </p>
+
+                <small class="text-muted">
+                    {{ comment.created_at|date:"F j, Y, g:i a" }}
+                </small>
+            </div>
+        </div>
+
+        {% empty %}
+        <p>No comments yet. Be the first to comment!</p>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

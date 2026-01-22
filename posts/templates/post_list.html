@@ -1,0 +1,46 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Feed - JinxxNetwork{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+
+    <div class="col-md-6">
+
+        <!-- Create Post Button -->
+        {% if user.is_authenticated %}
+        <div class="mb-4 text-end">
+            <a href="{% url 'posts:post_create' %}" class="btn btn-primary">New Post</a>
+        </div>
+        {% endif %}
+
+        <!-- Posts List -->
+        {% for post in posts %}
+        <div class="card mb-4 shadow">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url 'posts:post_detail' post.pk %}" style="color:#ff4d4d;">
+                        {{ post.author.username }}
+                    </a>
+                </h5>
+                <p class="card-text">{{ post.content|linebreaks }}</p>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid rounded mt-2" alt="Post Image">
+                {% endif %}
+                
+            </div>
+            <div class="card-footer text-muted">
+                {{ post.created_at|date:"F j, Y, g:i a" }}
+                {% if user == post.author %}
+                    <a href="{% url 'posts:post_delete' post.pk %}" class="btn btn-sm btn-danger float-end">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-white mt-5">No posts yet. Be the first to post!</p>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

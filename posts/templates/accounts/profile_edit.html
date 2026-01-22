@@ -1,0 +1,69 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+
+        <div class="card shadow-lg p-4">
+            <h3 class="text-center mb-4">Edit Profile</h3>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- User Fields -->
+                {% for field in user_form %}
+                    <div class="mb-3">
+
+                        <label style="color:#960101; font-weight:600;">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <small class="helptext">{{ field.help_text }}</small>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <!-- Profile Fields -->
+                {% for field in profile_form %}
+                    <div class="mb-3">
+
+                        <label style="color:#960101; font-weight:600;">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <small class="helptext">{{ field.help_text }}</small>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <button class="btn btn-primary w-100 mt-3" type="submit">
+                    Save Changes
+                </button>
+            </form>
+
+            <a class="btn btn-secondary w-100 mt-3"
+               href="{% url 'accounts:profile_view' user_obj.username %}">
+                Back to Profile
+            </a>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

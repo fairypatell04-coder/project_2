@@ -1,0 +1,82 @@
+{% extends 'posts/base.html' %}
+{% block title %}Feed{% endblock %}
+{% block content %}
+<h2>Feed</h2>
+{% for post in posts %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h6 class="card-subtitle mb-2 text-muted">
+        <a href="{% url 'accounts:profile_view' post.author.username %}">
+          {{ post.author.username }}
+        </a>
+        · {{ post.created_at|date:"M d, Y H:i" }}
+      </h6>
+      <p class="card-text">{{ post.content|linebreaksbr }}</p>
+      {% if post.image %}
+        <img src="{{ post.image.url }}" class="img-fluid mb-2" alt="post image">
+      {% endif %}
+      <div>
+        <a href="{% url 'posts:post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+        <a href="#" class="btn btn-sm btn-like {% if user in post.likes.all %}btn-danger{% else %}btn-outline-danger{% endif %}" 
+           data-id="{{ post.pk }}">
+          {% if user in post.likes.all %}Unlike{% else %}Like{% endif %}
+        </a>
+        <span class="ms-2" id="likes-count-{{ post.pk }}">{{ post.total_likes }}</span> likes
+      </div>
+    </div>
+  </div>
+{% empty %}
+  <p>No posts yet.</p>
+{% endfor %}
+
+<nav>
+  {% if is_paginated %}
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+      {% endif %}
+      <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% endif %}
+    </ul>
+  {% endif %}
+</nav>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const csrftoken = document.querySelector('meta[name="csrf-token"]').content;
+
+document.addEventListener('click', function(e){
+  if (e.target && e.target.classList.contains('btn-like')){
+    e.preventDefault();
+    const id = e.target.dataset.id;
+
+    fetch(`/post/${id}/like/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'same-origin'
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById(`likes-count-${id}`).textContent = data.total_likes;
+
+      // Update button text and color
+      if (data.liked) {
+        e.target.textContent = 'Unlike';
+        e.target.classList.remove('btn-outline-danger');
+        e.target.classList.add('btn-danger');
+      } else {
+        e.target.textContent = 'Like';
+        e.target.classList.remove('btn-danger');
+        e.target.classList.add('btn-outline-danger');
+      }
+    }).catch(console.error);
+  }
+});
+</script>
+{% endblock %}

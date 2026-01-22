@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JinxxNetwork Home</title>
+</head>
+<body>
+    <h1>Welcome to JinxxNetwork!</h1>
+
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user.username }}!</p>
+        <a href="{% url 'accounts:logout' %}">Logout</a>
+        <a href="{% url 'posts:feed' %}">Go to Feed</a>
+    {% else %}
+        <a href="{% url 'accounts:login' %}">Login</a>
+        <a href="{% url 'accounts:register' %}">Register</a>
+    {% endif %}
+
+</body>
+</html>

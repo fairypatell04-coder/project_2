@@ -1,0 +1,63 @@
+{% extends 'posts/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Login - JinxxNetwork{% endblock %}
+
+{% block extra_head %}
+<style>
+  .errorlist {
+    color: red;
+    margin: 5px 0;
+    padding: 2px 5px;
+    background-color: #330000;
+    border-radius: 5px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center mt-5">
+  <div class="card shadow-lg p-4" style="width: 400px;">
+    <h3 class="text-center mb-4">Login</h3>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- Show non-field errors -->
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <div class="errorlist">{{ error }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Username Field -->
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.username.id_for_label }}">
+          {{ form.username.label }}
+        </label>
+        {{ form.username|add_class:"form-control" }}
+        {% for error in form.username.errors %}
+          <div class="errorlist">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Password Field -->
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.password.id_for_label }}">
+          {{ form.password.label }}
+        </label>
+        {{ form.password|add_class:"form-control" }}
+        {% for error in form.password.errors %}
+          <div class="errorlist">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+
+    <p class="text-center mt-3">
+      Don’t have an account? <a href="{% url 'accounts:register' %}">Register here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

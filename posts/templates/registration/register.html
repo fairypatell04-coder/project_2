@@ -1,0 +1,78 @@
+{% extends 'posts/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Register - JinxxNetwork{% endblock %}
+
+{% block extra_head %}
+<style>
+  .helptext {
+    color: rgb(50, 184, 50);
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  .errorlist {
+    color: red;
+    margin: 5px 0;
+    padding: 2px 5px;
+    background-color: #330000;
+    border-radius: 5px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center mt-5">
+  <div class="card shadow-lg p-4" style="width: 400px;">
+    <h3 class="text-center mb-4">Register</h3>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- User Form Fields -->
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+          </label>
+
+          {{ field|add_class:"form-control" }}
+
+          {% if field.help_text %}
+            <small class="helptext">{{ field.help_text }}</small>
+          {% endif %}
+
+          {% for error in field.errors %}
+            <div class="errorlist">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      <!-- Profile Form Fields -->
+      {% for field in profile_form %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+          </label>
+
+          {{ field|add_class:"form-control" }}
+
+          {% if field.help_text %}
+            <small class="helptext">{{ field.help_text }}</small>
+          {% endif %}
+
+          {% for error in field.errors %}
+            <div class="errorlist">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn btn-primary w-100 mt-3">Register</button>
+    </form>
+
+    <p class="text-center mt-3">
+      Already have an account? <a href="{% url 'accounts:login' %}">Login here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
