@@ -82,8 +82,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Login redirects
 LOGIN_URL = 'accounts:login'
-LOGOUT_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = '/'  # or your feed page if you have one
+LOGIN_REDIRECT_URL = 'posts:feed'
+LOGOUT_REDIRECT_URL = 'login'
+  # or your feed page if you have one
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

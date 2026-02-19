@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth import login   # ✅ ADDED (missing before)
 from django.contrib import messages
+
 from .forms import CustomUserCreationForm, UserEditForm, ProfileEditForm
+
 
 # -----------------------------
 # Registration view
@@ -14,10 +17,16 @@ def register(request):
         if form.is_valid():
             user = form.save()
 
-            # Profile is already created by signals – just update it
+            # Profile is already created by signals – just update it safely
             profile = user.profile
-            profile.bio = form.cleaned_data.get('bio')
-            profile.image = form.cleaned_data.get('image')
+
+            # ✅ prevent NULL bio crash
+            profile.bio = form.cleaned_data.get('bio') or ""
+
+            # ✅ only set image if uploaded
+            if form.cleaned_data.get('image'):
+                profile.image = form.cleaned_data.get('image')
+
             profile.save()
 
             login(request, user)
@@ -45,17 +54,24 @@ def profile_view(request, username):
 @login_required
 def edit_profile(request, username):
     user_obj = get_object_or_404(User, username=username)
+
     if request.user != user_obj:
         return redirect('accounts:profile_view', username=request.user.username)
 
     if request.method == 'POST':
         user_form = UserEditForm(request.POST, instance=user_obj)
         profile_form = ProfileEditForm(request.POST, request.FILES, instance=user_obj.profile)
+
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            profile_form.save()
+
+            profile = profile_form.save(commit=False)
+            profile.bio = profile.bio or ""   # ✅ prevent NULL
+            profile.save()
+
             messages.success(request, 'Profile updated successfully!')
             return redirect('accounts:profile_view', username=user_obj.username)
+
     else:
         user_form = UserEditForm(instance=user_obj)
         profile_form = ProfileEditForm(instance=user_obj.profile)

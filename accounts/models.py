@@ -9,7 +9,7 @@ from django.dispatch import receiver
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     image = models.ImageField(upload_to='profile_pics/', default='default.jpg')
-    bio = models.TextField(blank=True)
+    bio = models.TextField(blank=True, default="")
 
     def __str__(self):
         return f"{self.user.username} Profile"
